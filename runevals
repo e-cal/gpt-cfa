@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+case $1 in
+l1)
+    level="l1"
+    script="evaluate.py"
+	;;
+l2)
+    level="l2"
+    script="evaluate2.py"
+    ;;
+*)
+	echo "Invalid argument. Please specify l1 or l2"
+	exit 1
+	;;
+esac
+
+i=1
+for f in $(find ./data/$level -type f | sort -V); do
+    echo
+    echo "Running evaluations for $f"
+
+    # echo
+    # echo "ChatGPT"
+    # python3 $script -f "$f" -o "attempts/$level/chatgpt_$i"".csv" -m gpt-3.5-turbo
+
+    # echo
+    # echo "ChatGPT CoT"
+    # python3 $script -f "$f" -o "attempts/$level/cot/chatgpt_$i""_cot.csv" -m gpt-3.5-turbo -c
+
+    # echo
+    # echo "GPT-4"
+    # python3 $script -f "$f" -o "attempts/$level/gpt4_$i"".csv" -m gpt-4
+
+    echo
+    echo "GPT-4 CoT"
+    python3 $script -f "$f" -o "attempts/$level/cot/gpt4_$i.csv" -m gpt-4 -c
+
+    ((i++))
+done
