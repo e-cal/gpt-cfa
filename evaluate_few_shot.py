@@ -6,6 +6,7 @@ import time
 import openai
 import pandas as pd
 from tqdm import tqdm
+import numpy as np
 
 # ------------------------------------------------------------------------------
 #                                 Parseargs
@@ -167,6 +168,20 @@ if args.few_shot_random or args.few_shot_topic:
 
 print(f"Few shot prompts: {len(few_shot_prompts)}")
 
+def get_few_shot_prompts():
+    # pick args.n_shots different even indices
+    idxs = set()
+    while len(idxs) < args.n_shots:
+        # gen random even number
+        while (idx := np.random.randint(0, len(few_shot_prompts), 1)[0]) % 2 != 0:
+            pass
+        idxs.add(idx)
+    idxs = [(i, i+1) for i in idxs]
+    idxs = [i for t in idxs for i in t]
+    return [few_shot_prompts[i] for i in idxs]
+        
+
+
 
 def ask_gpt(question):
     out = None
@@ -179,7 +194,9 @@ def ask_gpt(question):
                     "content": sys_prompt,
                 }
             ]
-            messages.extend(few_shot_prompts)
+
+            messages.extend(get_few_shot_prompts())
+
             messages.append(
                 {
                     "role": "user",
